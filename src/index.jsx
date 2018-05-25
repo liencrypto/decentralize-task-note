@@ -2,11 +2,13 @@ import "babel-polyfill";
 import React from "react";
 import ReactDOM from "react-dom";
 import './styles.css';
+import { injectNOS } from "./../../nos";
+
 class Note extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {text: '', listNotes: []};
+        this.state = {address: 'loading...', listNotes: []};
     }
 
     onSubmit = (event) => {
@@ -17,6 +19,17 @@ class Note extends React.Component {
 
     onChange = (event) => {
         this.setState({text: event.target.value});
+    };
+
+    componentWillMount = async () => {
+        const { NOS } = this.props.nos;
+        if (NOS) {
+            await this.GetUserWalletAddress();
+        }
+    };
+
+    GetUserWalletAddress = () => {
+
     };
 
     render() {
