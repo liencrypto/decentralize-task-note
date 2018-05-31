@@ -2,9 +2,17 @@ import "babel-polyfill";
 import React from "react";
 import ReactDOM from "react-dom";
 import './styles.css';
-import { injectNOS } from "./../../nos";
+import nos from "@nosplatform/api-functions/es6";
+import { create } from "axios";
+import {
+    str2hexstring,
+    int2hex,
+    hexstring2str
+} from "@cityofzion/neon-js/src/utils";
 
+const ipfs = "https://ipfs.infura.io/ipfs/";
 class Note extends React.Component {
+
 
     constructor(props) {
         super(props);
@@ -22,14 +30,31 @@ class Note extends React.Component {
     };
 
     componentWillMount = async () => {
-        const { NOS } = this.props.nos;
-        if (NOS) {
-            await this.GetUserWalletAddress();
-        }
+        await this.handleGetAddress();
+        await this.handleGetStorage();
     };
 
-    GetUserWalletAddress = () => {
+    handleGetAddress = async () => {
+        const address = await nos.getAddress();
+        this.setState({address: address});
+    };
 
+    handleGetStorage = async () => {
+        const scriptHash = "5115bed787fbc60175d6c5e954b8ef36986d1d49";
+        const key = "to-do-ipfs-hash";
+        const option = { encode: false };
+
+        const storedData = await nos.testInvoke(scriptHash, 'GetIPFSHash', ["LIENLIEN"], option);
+        console.log(hexstring2str(storedData));
+
+        const dataFromSmartContract = await nos.getStorage(scriptHash, key);
+        // const dataFromSmartContract = await nos.testInvoke(scriptHash, "GetIPFSHash", key, option);
+        alert(dataFromSmartContract);
+        console.log(hexstring2str(dataFromSmartContract));
+        // const ipfsFileHash = dataFromSmartContract.hash;
+        // const { data } = await req.get(ipfs + ipfsFileHash);
+        //
+        // this.setState({address: address});
     };
 
     render() {
@@ -39,7 +64,7 @@ class Note extends React.Component {
 
                     <div className="row-header">
                         <span className="add-new-note-text">Your wallet address: </span>
-                        <span className="wallet-text">AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y</span>
+                        <span className="wallet-text">{this.state.address}</span>
                         <div/>
                     </div>
 
